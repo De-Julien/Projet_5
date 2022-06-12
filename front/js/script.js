@@ -1,12 +1,15 @@
+// fonction pour créer les balises en fonction du nombre d'éléments dans le tableau.
+
 const articles = function(infos) {
     
     const section = document.getElementById("items");
+    const produit = "./product.html?id="
     
     for (let i = 0;i < infos.length; i++ ){
     let info = infos[i];
 
     const lien = document.createElement("a");
-    lien.href = "./product.html?id=42";
+    lien.href = produit + info._id;
     section.appendChild(lien);
     const article = document.createElement("article");
     lien.appendChild(article);
@@ -26,10 +29,11 @@ const articles = function(infos) {
     article.appendChild(paragraphe);
 }}
 
+// récupération d'un tableau contenant les informations sur le serveur et utilise la fonction du dessus.
+
 fetch("http://localhost:3000/api/products")
     .then(reponse => reponse.json())
     .then(data => {
-        console.table(data);
         articles(data);
     })
     .catch (e => console.log("Il y a un problème avec " + e));
