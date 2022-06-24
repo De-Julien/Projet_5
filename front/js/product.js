@@ -41,12 +41,13 @@ bouton.onclick = () => {
     let information = produit.find(p => kanap.id == p.id && kanap.teinte == p.teinte);
     // si un produit se trouve deja dans le localStorage on met juste à jour le nombre.
     if (information) {
-
       information.nombre += kanap.nombre;
       localStorage.setItem("produits", JSON.stringify(produit));
+      alert("Votre article a bien été ajouté au panier.");
     } else {
       produit.push(kanap);
       localStorage.setItem("produits", JSON.stringify(produit));
+      alert("Votre article a bien été ajouté au panier.");
     }
   }
   // il n'y a pas de tableau on le créer pour mettre les infos dedans.
