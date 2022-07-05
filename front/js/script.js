@@ -1,4 +1,5 @@
-// fonction pour créer les balises en fonction du nombre d'éléments dans le tableau.
+/** fonction pour créer les balises en fonction du nombre d'éléments dans le tableau.
+ */
 
 const articles = function(infos) {
     
@@ -28,7 +29,8 @@ const articles = function(infos) {
         article.appendChild(paragraphe);
 }}
 
-// récupération d'un tableau contenant les informations sur le serveur et utilise la fonction du dessus.
+/** récupération d'un tableau contenant les informations sur le serveur et utilise la foncti
+ */
 
 fetch("http://localhost:3000/api/products")
     .then(reponse => reponse.json())
