@@ -67,6 +67,17 @@ bouton.onclick = () => {
 /** récupération d'un tableau contenant les informations sur le serveur.
  */
 fetch(`http://localhost:3000/api/products/${idProduit}`)
-  .then(reponse => reponse.json())
+  .catch(() => alert("Le serveur est déconnecté !!"))
+  .then(reponse => {
+    /** Si la requête est Ok.
+    */
+    if (idProduit.status == 200) {
+      return reponse.json()
+      /** Si le produit cherché n'existe pas.
+      */
+    } else {
+      alert("Le produit recherché n'existe pas !!");
+    }
+  })
   .then(data => produit(data))
-  .catch(e => console.log("Il y a un problème avec " + e));
+

@@ -1,11 +1,11 @@
 /** fonction pour créer les balises en fonction du nombre d'éléments dans le tableau.
  */
 
-const articles = function(infos) {
-    
+const articles = function (infos) {
+
     const section = document.getElementById("items");
-    
-    for (let i = 0;i < infos.length; i++ ){
+
+    for (let i = 0; i < infos.length; i++) {
         let info = infos[i];
 
         const lien = document.createElement("a");
@@ -27,12 +27,13 @@ const articles = function(infos) {
         let texte_paragraphe = document.createTextNode(info.description);
         paragraphe.appendChild(texte_paragraphe);
         article.appendChild(paragraphe);
-}}
+    }
+}
 
-/** récupération d'un tableau contenant les informations sur le serveur et utilise la foncti
+/** récupération d'un tableau contenant les informations sur le serveur.
  */
 
 fetch("http://localhost:3000/api/products")
+    .catch(() => alert("Le serveur est déconnecté !!"))
     .then(reponse => reponse.json())
     .then(data => articles(data))
-    .catch (e => console.log("Il y a un problème avec " + e));

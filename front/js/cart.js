@@ -56,7 +56,7 @@ function creationDom(local, api) {
     paraDelete.className = "deleteItem";
     paraDelete.textContent = "Supprimer";
     /** écoute les changement de valeur sur input.value et modifient les quantités/prix.
-     */
+    */
     input.addEventListener("change", function () {
         let information = infoLocal.find(p => article.id == p.id && article.color == p.teinte && p.nombre != input.value);
         information.nombre = input.value;
@@ -76,6 +76,7 @@ function creationDom(local, api) {
         totalPrix();
     })
 }
+
 /**   fonction qui calcul la quantité total.
     * @param {Array} quantites
 */
@@ -106,12 +107,28 @@ let infoLocal = JSON.parse(localStorage.getItem("produits"));
 let leTotal = document.getElementById("totalPrice");
 let montant = 0;
 let infoApi = [];
-
+/** Récupération des informations sur le produit et créer les cards produit.
+ */
 const lesProduits = async function () {
     for (let i = 0; i < infoLocal.length; i++) {
         let infos = infoLocal[i];
         await fetch(`http://localhost:3000/api/products/${infos.id}`)
-            .then(reponse => reponse.json())
+            .catch(() => alert("Le serveur est déconnecté !!"))
+            .then(reponse => {
+                /** Si la requête est Ok.
+                */
+                if (reponse.status == 200) {
+                    return reponse.json()
+                    /** Si un produit dans le localStorage n'est pas reconnu.
+                     */
+                } else if (reponse.status == 404) {
+                    let mauvaisProduit = infoLocal.filter(p => infos.id != p.id && infos.teinte != p.teinte);
+                    console.log(mauvaisProduit);
+                    localStorage.setItem("produits", JSON.stringify(mauvaisProduit));
+                    alert("Un des produits de votre panier n'existe pas, il va être supprimé !!");
+                    throw new Error
+                }
+            })
             .then(data => {
                 infoLocal.sort();
                 infoApi.push(data);
@@ -119,6 +136,9 @@ const lesProduits = async function () {
                 totalQuantite(infoLocal);
                 montant += (parseInt(infos.nombre) * parseInt(data.price));
                 leTotal.textContent = `${montant},00`;
+            })
+            .catch((err) => {
+
             })
     }
 }
@@ -178,36 +198,43 @@ const panierInfoClient = {
     contact: contact,
     products: products
 }
-
+/**  Ecoute le champ prenom du formulaire.
+ */
 prenom.addEventListener("change", function () {
     prenomValide = valider("^[a-zA-Z]+-{0,1}[a-zA-Z]+$", prenom.value, "firstNameErrorMsg", "le prénom n'est pas valide !")
     contact.firstName = prenom.value;
 });
-
+/**  Ecoute le champ nom du formulaire.
+ */
 nom.addEventListener("change", function () {
     nomValide = valider("^[a-zA-Z]{2,}$", nom.value, "lastNameErrorMsg", "le nom n'est pas valide !")
     contact.lastName = nom.value;
 });
-
+/**  Ecoute le champ adresse du formulaire.
+ */
 adresse.addEventListener("change", function () {
-    adresseValide = valider("^[0-9]{1,} [a-zA-Z]+ [a-zA-Z-]+$", adresse.value, "addressErrorMsg", "l'adresse n'est pas valide !")
+    adresseValide = valider("^[a-zA-Z0-9- _]{5,}$", adresse.value, "addressErrorMsg", "l'adresse n'est pas valide !")
     contact.address = adresse.value;
 });
-
+/**  Ecoute le champ ville du formulaire.
+ */
 ville.addEventListener("change", function () {
-    villeValide = valider("^[a-zA-Z]{2,}$", ville.value, "cityErrorMsg", "la ville n'est pas valide !")
+    villeValide = valider("^[a-zA-Z- ]{2,}$", ville.value, "cityErrorMsg", "la ville n'est pas valide !")
     contact.city = ville.value;
 });
-
+/**  Ecoute le champ email du formulaire.
+ */
 email.addEventListener("change", function () {
-    emailValide = valider("^[a-zA-Z0-9.-_]+@[a-zA-Z0-9.-_]{2,}\.[a-z]$", email.value, "emailErrorMsg", "l'email n'est pas valide !")
+    emailValide = valider("^[a-zA-Z0-9.-_]+@[a-zA-Z0-9-]{2,}[.][a-z]{2,3}$", email.value, "emailErrorMsg", "l'email n'est pas valide !")
     contact.email = email.value;
 });
 let commander = document.querySelector("#order");
-/** ecoute le bouton commander et envoi le fichier panierInfoClients.
+/** ecoute le bouton commander pour envoyer les données.
  */
 commander.addEventListener("click", async function (e) {
     e.preventDefault();
+    /**  Si tous les champs sont valide les données sont envoyé.
+    */
     if (prenomValide && nomValide && adresseValide && villeValide && emailValide) {
         infoLocalId();
         let rep = await fetch(`http://localhost:3000/api/products/order`, {
@@ -220,7 +247,8 @@ commander.addEventListener("click", async function (e) {
         let commande = await rep.json();
         console.log(commande);
         location.href = `confirmation.html?id=${commande.orderId}`
-
+        /**  Si un des champs n'est pas validé l'utilisateur reçoit une alerte.
+        */
     } else {
         alert("les champs ne sont pas remplis !")
     }
